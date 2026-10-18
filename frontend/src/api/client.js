@@ -25,9 +25,11 @@ async function toApiError(res) {
   return new ApiError(code, res.statusText || 'Request failed', res.status);
 }
 
+let activeBase = API_BASE;
+
 async function send(path, { method = 'GET', body, signal } = {}) {
   try {
-    return await fetch(`${API_BASE}${path}`, {
+    return await fetch(`${activeBase}${path}`, {
       method,
       signal,
       headers: body ? { 'Content-Type': 'application/json' } : undefined,
@@ -35,7 +37,7 @@ async function send(path, { method = 'GET', body, signal } = {}) {
     });
   } catch (err) {
     if (err.name === 'AbortError') throw err;
-    throw new ApiError('NETWORK_ERROR', `Can't reach the API at ${API_BASE}.`);
+    throw new ApiError('NETWORK_ERROR', `Can't reach the API at ${activeBase}.`);
   }
 }
 
@@ -66,7 +68,11 @@ async function streamChat(body, { signal, onToken, onDone } = {}) {
     try { payload = JSON.parse(data.join('\n')); } catch { return; }
     if (event === 'token') onToken?.(payload.delta ?? '');
     else if (event === 'done') onDone?.(payload);
-    else if (event === 'error') throw new ApiError(payload.code || 'LLM_BAD_OUTPUT', payload.message || 'Stream failed');
+    else if (event === 'error') {
+      const code = payload.error?.code || payload.code || 'LLM_BAD_OUTPUT';
+      const msg = payload.error?.message || payload.message || 'Stream failed';
+      throw new ApiError(code, msg);
+    }
   };
 
   for (;;) {
@@ -81,7 +87,28 @@ async function streamChat(body, { signal, onToken, onDone } = {}) {
 }
 
 export const api = {
-  health: () => request('/health'),
+  health: async () => {
+    try {
+      return await request('/health');
+    } catch (err) {
+      // Auto-detect alternate local port if primary is unreachable (8000 <-> 8001)
+      const alt = activeBase.includes(':8001')
+        ? activeBase.replace(':8001', ':8000')
+        : activeBase.includes(':8000')
+          ? activeBase.replace(':8000', ':8001')
+          : null;
+      if (alt) {
+        try {
+          const res = await fetch(`${alt}/health`);
+          if (res.ok) {
+            activeBase = alt;
+            return await res.json();
+          }
+        } catch { /* ignore fallback error */ }
+      }
+      throw err;
+    }
+  },
   meta: () => request('/meta'),
   bugfix: (body, signal) => request('/bugfix', { method: 'POST', body, signal }),
   docstrings: (body, signal) => request('/generate/docstrings', { method: 'POST', body, signal }),

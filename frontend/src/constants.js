@@ -1,5 +1,5 @@
 export const API_BASE =
-  import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+  import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001/api/v1';
 
 // Fallbacks used until GET /meta responds (or if it fails).
 export const DEFAULT_META = {

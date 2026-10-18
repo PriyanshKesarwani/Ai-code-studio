@@ -1,8 +1,8 @@
+@import url('prismjs/themes/prism-tomorrow.css');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import url('prismjs/themes/prism-tomorrow.css');
 
 html, body, #root { height: 100%; margin: 0; overflow: hidden; }
 body { font-family: 'Inter', system-ui, sans-serif; }
