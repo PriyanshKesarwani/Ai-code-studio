@@ -53,7 +53,11 @@ def _google_payload(system: str, messages: list[dict], temperature: float) -> di
 
 def _google_text(data: dict) -> str:
     try:
-        return "".join(p.get("text", "") for p in data["candidates"][0]["content"]["parts"])
+        parts = data["candidates"][0]["content"]["parts"]
+        non_thought = [p.get("text", "") for p in parts if not p.get("thought")]
+        if non_thought:
+            return "".join(non_thought)
+        return "".join(p.get("text", "") for p in parts)
     except (KeyError, IndexError, TypeError):
         raise AppError("LLM_BAD_OUTPUT", "Model returned an empty or blocked response", 502)
 
@@ -160,8 +164,8 @@ async def stream(system: str, messages: list[dict]) -> AsyncIterator[str]:
                         continue
                     data = json.loads(chunk)
                     if provider == "google":
-                        yield "".join(p.get("text", "") for p in
-                                      data.get("candidates", [{}])[0].get("content", {}).get("parts", []))
+                        parts = data.get("candidates", [{}])[0].get("content", {}).get("parts", [])
+                        yield "".join(p.get("text", "") for p in parts if not p.get("thought"))
                     else:
                         yield data["choices"][0].get("delta", {}).get("content") or ""
     except httpx.TimeoutException:
