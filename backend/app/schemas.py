@@ -166,3 +166,11 @@ class ChatMessage(BaseModel):
 class ChatHistory(BaseModel):
     session_id: str
     messages: list[ChatMessage]
+# ---------- errors (documented in OpenAPI so the frontend can type them) ----------
+class ErrorBody(BaseModel):
+    code: str
+    message: str
+
+
+class ErrorResponse(BaseModel):
+    error: ErrorBody

@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('prismjs/themes/prism-tomorrow.css');
+
+html, body, #root { height: 100%; margin: 0; overflow: hidden; }
+body { font-family: 'Inter', system-ui, sans-serif; }
+pre, code, textarea { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+select { color-scheme: dark; }
+select option { background-color: #0d1322; color: #e2e8f0; }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #080c14; }
+::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #334155; }
+
+/* Applied to <body> while a splitter is being dragged */
+body.is-resizing { user-select: none; -webkit-user-select: none; }
+
+/* Prism: let our own containers control the background */
+pre[class*='language-'], code[class*='language-'] {
+  background: transparent; margin: 0; padding: 0; text-shadow: none;
+}
+
+/* Rendered markdown (chat replies) */
+.md-body { font-size: 0.75rem; line-height: 1.65; overflow-wrap: anywhere; }
+.md-body > :first-child { margin-top: 0; }
+.md-body > :last-child { margin-bottom: 0; }
+.md-body p { margin: 0.5rem 0; }
+.md-body ul { list-style: disc; padding-left: 1.25rem; margin: 0.5rem 0; }
+.md-body ol { list-style: decimal; padding-left: 1.25rem; margin: 0.5rem 0; }
+.md-body h1, .md-body h2, .md-body h3 { font-weight: 600; color: #67e8f9; margin: 0.9rem 0 0.35rem; }
+.md-body h1 { font-size: 1rem; } .md-body h2 { font-size: 0.9rem; } .md-body h3 { font-size: 0.8rem; }
+.md-body a { color: #22d3ee; text-decoration: underline; }
+.md-body :not(pre) > code { background: #1e293b; padding: 0.1rem 0.3rem; border-radius: 0.25rem; color: #a5f3fc; }
+.md-body pre { background: #05080f; border: 1px solid #1e293b; border-radius: 0.5rem; padding: 0.75rem; overflow-x: auto; margin: 0.6rem 0; }
+.md-body table { border-collapse: collapse; margin: 0.5rem 0; }
+.md-body th, .md-body td { border: 1px solid #1e293b; padding: 0.25rem 0.5rem; }
+.md-body blockquote { border-left: 2px solid #155e75; padding-left: 0.75rem; color: #94a3b8; margin: 0.5rem 0; }
